@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
 #include "definitionsDES.h"
  
 typedef struct {
@@ -283,38 +282,36 @@ String encrypt(const key_t2 key, const ubyte *message, int len) {
  
     return result;
 }
- 
+
 int main() {
 	const ubyte messagePlain[] = { 0x43, 0x41, 0x4D, 0x49, 0x4E, 0x48, 0x4F, 0x53 };
+	const ubyte messageEncoded[] = { 0x2B, 0xB1, 0x8A, 0xAE, 0xA2, 0xE6, 0x27, 0x8A };
 	int len = sizeof(messagePlain) / sizeof(ubyte);
 	int i;
-	char buffer[64];
-	char messageEncoded[64] = {'2', 'B', 'B', '1', '8', 'A', 'A', 'E', 'A', '2', 'E', '6', '2', '7', '8', 'A'};
+	char buffer[128], bufferMessageEncoded[128];
 	String encoded;
 
-	for(i=0; i<pow(2, 2); i++) { //Alterar para testar as pow(2, 16) chaves possiveis para chaves de 16 bits.
-		//key_t2 key = obtain_key(i); //Criar funcao para fornecer a chave "i" a ser testada. Apagar linha abaixo.
+	int tamanho;
+	printf("Entre com o tamanho da chave: ");
+	scanf("%d", &tamanho);
+
+	for(i=0; i<pow(2, tamanho); i++) { //Alterar para testar as pow(2, 16) chaves possiveis para chaves de 16 bits.
+		//key_t2 key = *obtain_key(i); //Criar funcao para fornecer a chave "i" a ser testada. Apagar linha abaixo.
 		key_t2 key = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x07, 0xD5, 0x94 };
 		encoded = encrypt(key, messagePlain, len);
 		printBytes(encoded.data, encoded.len/2, buffer);
+		printBytes(messageEncoded, encoded.len/2, bufferMessageEncoded);
 
-		printf("buffer : %s\n", buffer);
-		printf("messageEncoded : %s\n", messageEncoded);
-
-		if(buffer == messageEncoded) { //Concertar condicao para que seja atendida quando mensagens forem iguais. Provavel problema com tipos das variaveis?
-			printf("Entrei\n");
-
+		if(!strcmp(buffer, bufferMessageEncoded)) {
     			printf("Encoded text : %s\n", buffer);
-
-			printBytes(key, KEY_LEN, buffer);
-			printf("Key          : %s\n", buffer);
 
 			printBytes(messagePlain, len, buffer);
 			printf("Plain text   : %s\n", buffer);
 
+			printBytes(key, KEY_LEN, buffer);
+			printf("Key          : %s\n", buffer);
+
 			return 0;
-		} else {
-			printf("Nao entrei\n");
 		}
 		if (encoded.len > 0) {
 			free(encoded.data);
@@ -322,6 +319,7 @@ int main() {
 		}
 
 	};
-
+	
+	printf("Key not founded.");
 	return 0;
 }
